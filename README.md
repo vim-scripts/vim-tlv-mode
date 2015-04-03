@@ -6,7 +6,8 @@ everything needed to efficiently develop TLV code in Vim:
 
  * File type detection
  * Syntax highlighting (including an optional color scheme)
- * Smart indentation
+ * Automatic (smart) indentation
+ * Automatic text folding
  * Checking for syntax errors (work in progress)
 
 Each of the features outlined above is discussed in more detail below.
@@ -17,11 +18,10 @@ stay tuned: As soon as TLV has been launched I will provide references here.*
 
 ## Install & first use
 
-Unzip the [most recent ZIP archive] [download-tlv-mode] of the *vim-tlv-mode* plug-in inside your Vim profile directory (usually this is `~/.vim` on UNIX and `%USERPROFILE%\vimfiles` on Windows), restart Vim and execute the command `:helptags ~/.vim/doc` (use `:helptags ~\vimfiles\doc` instead on Windows).
-
-If you prefer you can also use [Pathogen] [pathogen], [Vundle] [vundle] or a similar tool to install and update the *vim-tlv-mode* plug-in using a local clone of [the git repository] [github-tlv-mode].
-
-Now try it out: Edit a `*.tlv` file and inspect the syntax highlighting in `\TLV` code blocks! You can also play around with the smart indentation to get a feel for how it works.
+Please refer to the [installation instructions] [howto-install] available on
+GitHub. Once you've installed the plug-in try it out: Edit a `*.tlv` file and
+inspect the syntax highlighting in `\TLV` code blocks! You can also play around
+with the smart indentation to get a feel for how it works.
 
 ## Features
 
@@ -68,17 +68,39 @@ highlighting support] [m4_syntax] to highlight M4 macros embedded in TLV files.
 
 There is a recommended color scheme for editing Transaction-Level Verilog code
 and *vim-tlv-mode* contains a Vim color scheme script called (you guessed it
-:-) *tlv* that provides this recommended color scheme to Vim.
+:-) *tlv* that provides this recommended color scheme to Vim. Of course you're
+free to decide whether to use this color scheme or not, the choice is up to
+you. The syntax highlighting mode is intended to work well with other Vim color
+schemes as well.
 
-Of course you are free to decide whether to use this color scheme or not, the
-choice is up to you. The syntax highlighting mode is intended to work well with
-other Vim color schemes as well.
+The color scheme was created with [graphical Vim] [gvim] in mind because the
+recommended colors are not available in terminal Vim (because terminal Vim is
+limited to a fixed palette with a maximum of 256 colors). I may try to make the
+color scheme compatible with terminal Vim as well, but I'm not yet sure how
+well that will work.
 
-### Smart indentation
+To try out the color scheme you can use the following command:
+
+    :colorscheme tlv
+
+If you like the color scheme you can add the command above to your [vimrc
+script] [vimrc] to make the choice permanent.
+
+### Automatic (smart) indentation
 
 The *vim-tlv-mode* plug-in uses Vim's ['indentexpr'] [indentexpr] option to
-implement smart indentation that understands TLV scope rules and automatically
-increases the indentation level as needed.
+implement smart indentation (that understands TLV scope rules and knows to
+ignore line type characters) and automatically increases the indentation level
+as needed.
+
+### Automatic text folding
+
+The *vim-tlv-mode* plug-in uses Vim's ['foldexpr'] [foldexpr] option to
+implement automatic text folding (that understands TLV scope rules and knows to
+ignore line type characters). This method of text folding is already a big
+improvement over indentation based folding (because that falls apart as soon as
+line type characters are introduced) but it's not perfect yet; I'd like to
+improve it further.
 
 ### Checking for syntax errors
 
@@ -86,35 +108,54 @@ To compile TLV code you need the `sandpiper` compiler. When the *vim-tlv-mode*
 plug-in sees that you have the `sandpiper` compiler installed it will
 automatically run the compiler every time you save a TLV file. If the compiler
 reports syntax warnings or errors a [location-list-window] [llw] pops up to
-show you an overview of compiler messages. When you click on a recognized line
-in the location list window you'll automatically jump to the line in the TLV
-file where the message was reported.
+show you an overview of compiler messages. When you click on a line in the
+location list window you'll automatically jump to the line in the TLV file
+where the message was reported.
 
-Please note that this feature is still in development (not finished yet) so for
-now the automatic syntax checking is disabled by default. The to-do list in the
-file `TODO.md` contains more details (refer to the version control repository
-on GitHub).
+#### Setting it up
+
+To get the automatic syntax checking working you need to have the `sandpiper`
+compiler installed on your `$PATH`. To set this up you create a symbolic link
+from a directory in your `$PATH` to the `bin/sandpiper` executable in the TLV
+compiler distribution (which also contains an `m4` directory next to the `bin`
+directory). In order to use the TLV compiler the *vim-tlv-mode* plug-in needs
+to use the command line option `-m4inc` with the absolute pathname of the `m4`
+directory. The symbolic link is used by the *vim-tlv-mode* plug-in to find the
+pathname of the `m4` directory inside the TLV compiler distribution.
+
+#### Status of this feature
+
+_Please note that this feature is still in development (not finished yet)._ It
+is working quite well already for plain TLV files but it needs more work for
+TLV files that involve significant M4 preprocessing (this breaks the file names
+and line numbers and I'm not yet sure how to match them up afterwards).
 
 ## Contact
 
 If you have questions, bug reports, suggestions, etc. the author can be
 contacted at <peter@peterodding.com>. The latest version is available at
-[github.com/xolox/vim-tlv-mode](https://github.com/xolox/vim-tlv-mode).
+[peterodding.com/code/vim/tlv-mode] [homepage] and
+[github.com/xolox/vim-tlv-mode] [github-tlv-mode]. If you like the plug-in
+please vote for it on [Vim Online] [vim-online].
 
 ## License
 
-The license of this Vim plug-in is to be determined, please stand by while we
-make up our mind ;-).
+This software is licensed under the [MIT license] [mit].  
+© 2015 Peter Odding &lt;<peter@peterodding.com>&gt;.
 
 
-[download-tlv-mode]: http://peterodding.com/code/vim/downloads/tlv-mode.zip
+[foldexpr]: http://vimdoc.sourceforge.net/htmldoc/options.html#'foldexpr'
 [github-tlv-mode]: https://github.com/xolox/vim-tlv-mode
+[gvim]: http://vimdoc.sourceforge.net/htmldoc/gui.html#gui
+[homepage]: http://peterodding.com/code/vim/tlv-mode/
+[howto-install]: https://github.com/xolox/vim-tlv-mode/blob/master/INSTALL.md
 [indentexpr]: http://vimdoc.sourceforge.net/htmldoc/options.html#'indentexpr'
 [llw]: http://vimdoc.sourceforge.net/htmldoc/quickfix.html#location-list-window
 [m4]: http://en.wikipedia.org/wiki/M4_(computer_language)
 [m4_syntax]: https://code.google.com/p/vim/source/browse/runtime/syntax/m4.vim
-[pathogen]: http://www.vim.org/scripts/script.php?script_id=2332
+[mit]: http://en.wikipedia.org/wiki/MIT_License
 [sv]: http://en.wikipedia.org/wiki/SystemVerilog
 [sv_syntax]: https://code.google.com/p/vim/source/browse/runtime/syntax/systemverilog.vim
+[vim-online]: http://www.vim.org/scripts/script.php?script_id=5130
 [vim]: http://www.vim.org/
-[vundle]: https://github.com/gmarik/vundle
+[vimrc]: http://vimdoc.sourceforge.net/htmldoc/starting.html#vimrc
